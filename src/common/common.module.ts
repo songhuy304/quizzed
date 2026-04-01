@@ -3,6 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 
 import { DatabaseModule } from './database/database.module';
 import configs from '@/common/configs';
+import { RequestModule } from '@/common/request/request.module';
+import { LoggerModule } from '@/common/logger/logger.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import configs from '@/common/configs';
 
     // Core Infrastructure
     DatabaseModule,
+    RequestModule,
+    LoggerModule,
   ],
   exports: [DatabaseModule],
 })
