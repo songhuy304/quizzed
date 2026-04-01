@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import express from 'express';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { Logger } from 'nestjs-pino';
@@ -24,6 +24,7 @@ async function bootstrap() {
 
     app.useLogger(logger);
     app.enableCors(config.get('app.cors'));
+    app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
 
     // Start server
     await app.listen(port, host);
@@ -31,7 +32,9 @@ async function bootstrap() {
     const appUrl = await app.getUrl();
     logger.log(`Server running on: ${appUrl}`);
   } catch (error) {
-    console.error(error);
+    console.error('Server failed to start:', error);
+    if (app) await app.close();
+    process.exit(1);
   }
 }
 void bootstrap();
