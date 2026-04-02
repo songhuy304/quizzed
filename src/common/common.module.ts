@@ -5,6 +5,7 @@ import { DatabaseModule } from './database/database.module';
 import configs from '@/common/configs';
 import { RequestModule } from '@/common/request/request.module';
 import { LoggerModule } from '@/common/logger/logger.module';
+import { HelperModule } from './helper/helper.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { LoggerModule } from '@/common/logger/logger.module';
     DatabaseModule,
     RequestModule,
     LoggerModule,
+    HelperModule,
   ],
   exports: [DatabaseModule],
 })
