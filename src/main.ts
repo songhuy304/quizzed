@@ -1,7 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import express from 'express';
-import { INestApplication, VersioningType } from '@nestjs/common';
+import {
+  INestApplication,
+  ValidationPipe,
+  VersioningType,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { Logger } from 'nestjs-pino';
@@ -21,10 +25,23 @@ async function bootstrap() {
     const logger = app.get(Logger);
     const port = config.get<number>('app.http.port');
     const host = config.get<string>('app.http.host');
+    const version = config.get<string>('app.versioning.version');
 
     app.useLogger(logger);
     app.enableCors(config.get('app.cors'));
-    app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
+    app.enableVersioning({
+      type: VersioningType.URI,
+      defaultVersion: version ?? '1',
+      prefix: config.get<string>('app.versioning.prefix'),
+    });
+
+    app.useGlobalPipes(
+      new ValidationPipe({
+        transform: true,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+      }),
+    );
 
     // Start server
     await app.listen(port, host);

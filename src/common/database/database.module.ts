@@ -8,14 +8,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     ConfigModule,
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
+      useFactory: () => ({
         type: 'postgres',
-        url: configService.getOrThrow<string>('DATABASE_URL'),
+        url: process.env.DATABASE_URL,
         autoLoadEntities: true,
         synchronize: false,
-        ssl: {
-          rejectUnauthorized: false,
-        },
+        ssl: { rejectUnauthorized: false },
+        migrations: [__dirname + '/../../migrations/*{.ts,.js}'],
+        migrationsRun: false,
       }),
     }),
   ],

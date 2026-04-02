@@ -9,11 +9,8 @@ export class DatabaseService implements OnModuleInit {
   constructor(private readonly dataSource: DataSource) {}
 
   async onModuleInit() {
-    try {
-      await this.dataSource.query('SELECT 1');
-      this.logger.log('Database connected');
-    } catch (err) {
-      this.logger.error('Database connection failed', err as Error);
+    if (!this.dataSource.isInitialized) {
+      await this.dataSource.initialize();
     }
   }
 

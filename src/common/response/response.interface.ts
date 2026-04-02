@@ -1,10 +1,10 @@
-export interface IApiBaseRes {
-  code: number;
+export interface IApiBaseResponse {
+  success: boolean;
   message: string;
 }
 
-export interface IApiSuccessRes<T> extends IApiBaseRes {
-  data: T;
+export interface IApiResponse<T> extends IApiBaseResponse {
+  data: T | null;
 }
 
 export interface IPaginationMetadata {
@@ -14,7 +14,7 @@ export interface IPaginationMetadata {
   totalPages: number;
 }
 
-export interface IApiPaginated<T> extends IApiBaseRes {
+export interface IApiPaginated<T> extends IApiBaseResponse {
   data: T[];
-  metaData: IPaginationMetadata;
+  meta: IPaginationMetadata;
 }

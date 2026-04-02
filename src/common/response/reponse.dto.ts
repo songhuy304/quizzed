@@ -1,0 +1,41 @@
+import { IApiBaseResponse } from '@/common/response/response.interface';
+import { Expose } from 'class-transformer';
+
+export class ApiGenericResponseDto implements IApiBaseResponse {
+  @Expose()
+  success: boolean;
+
+  @Expose()
+  message: string;
+
+  constructor(success: boolean, message: string) {
+    this.success = success;
+    this.message = message;
+  }
+
+  static success(message: string): ApiGenericResponseDto {
+    return new ApiGenericResponseDto(true, message);
+  }
+
+  static error(message: string): ApiGenericResponseDto {
+    return new ApiGenericResponseDto(false, message);
+  }
+}
+
+export class ApiResponseDto<T> extends ApiGenericResponseDto {
+  @Expose()
+  data: T | null;
+
+  constructor(success: boolean, message: string, data: T | null = null) {
+    super(success, message);
+    this.data = data;
+  }
+
+  static success<T>(message: string, data?: T): ApiResponseDto<T> {
+    return new ApiResponseDto<T>(true, message, data ?? null);
+  }
+
+  static error<T>(message: string): ApiResponseDto<T> {
+    return new ApiResponseDto<T>(false, message, null);
+  }
+}
