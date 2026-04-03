@@ -1,25 +1,8 @@
+import { PaginationRequestDto } from '@/common/request/dtos/pagination.request.dto';
 import { Transform } from 'class-transformer';
-import {
-  IsInt,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  Max,
-  Min,
-} from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
-export class PostGetDto {
-  @IsInt()
-  @IsNotEmpty()
-  @Min(1)
-  @Max(100)
-  limit: number;
-
-  @IsInt()
-  @IsNotEmpty()
-  @Min(1)
-  page: number;
-
+export class PostGetDto extends PaginationRequestDto {
   @IsString()
   @IsOptional()
   @Transform(({ value }: { value: unknown }) =>

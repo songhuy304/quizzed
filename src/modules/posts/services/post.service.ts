@@ -1,23 +1,27 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
-import { Post } from '../entities/post.entity';
-import { PostCreateDto, PostGetDto } from '../dtos/request';
-import { PostResponseDto } from '../dtos/reponse';
-import { IPostService } from '../interfaces/post.service.interface';
 import { ERROR_POST } from '@/common/constants';
+import { SortOrder } from '@/common/enums';
+import { HelperPaginationService } from '@/common/helper/services/helper.pagination.service';
+import { HelperQueryService } from '@/common/helper/services/helper.query.service';
 import {
   ApiGenericResponseDto,
   ApiResponseDto,
-  PaginationMetadataDto,
   PaginatedResponseDto,
 } from '@/common/response';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { PostResponseDto } from '../dtos/reponse';
+import { PostCreateDto, PostGetDto } from '../dtos/request';
+import { Post } from '../entities/post.entity';
+import { IPostService } from '../interfaces/post.service.interface';
 
 @Injectable()
 export class PostService implements IPostService {
   constructor(
     @InjectRepository(Post)
     private readonly postRepo: Repository<Post>,
+    private readonly _helperPagi: HelperPaginationService,
+    private readonly _helperQuery: HelperQueryService,
   ) {}
 
   async findOne(id: number): Promise<PostResponseDto> {
@@ -40,7 +44,6 @@ export class PostService implements IPostService {
 
   async delete(id: number): Promise<ApiGenericResponseDto> {
     await this.findOne(id);
-    // Delete by primary key to avoid any type mismatch on criteria.
     await this.postRepo.delete(id);
     return ApiGenericResponseDto.success('post.success');
   }
@@ -50,28 +53,44 @@ export class PostService implements IPostService {
     return ApiResponseDto.success('post.success', post);
   }
 
+  // cách dùng builder query
   async getAll(
     params: PostGetDto,
   ): Promise<PaginatedResponseDto<PostResponseDto>> {
-    const { search, page = 1, limit = 10 } = params;
+    const { page = 1, limit = 10, search } = params;
+    const qb = this.postRepo.createQueryBuilder('post');
 
-    const [data, total] = await this.postRepo.findAndCount({
-      where: search ? [{ title: ILike(`%${search}%`) }] : undefined,
-      skip: (page - 1) * limit,
-      take: limit,
+    if (search) {
+      qb.andWhere('(post.title ILIKE :search OR post.content ILIKE :search)', {
+        search: `%${search}%`,
+      });
+    }
+
+    const { data, meta } = await this._helperPagi.paginateQueryBuilder(qb, {
+      page,
+      limit,
     });
 
-    const meta = new PaginationMetadataDto();
-    meta.currentPage = page;
-    meta.itemsPerPage = limit;
-    meta.totalItems = total;
-    meta.totalPages = Math.ceil(total / limit);
+    return PaginatedResponseDto.success(data, meta);
+  }
 
-    const response = new PaginatedResponseDto<PostResponseDto>();
-    response.success = true;
-    response.message = 'post.success';
-    response.data = data;
-    response.meta = meta;
-    return response;
+  // cách dùng reposity
+  async getAllRepo(
+    params: PostGetDto,
+  ): Promise<PaginatedResponseDto<PostResponseDto>> {
+    const { page = 1, limit = 10, search } = params;
+
+    const { data, meta } = await this._helperQuery.findMany(this.postRepo, {
+      filters: [
+        { field: 'title', op: 'ilike', value: search },
+        { field: 'content', op: 'ilike', value: search },
+      ],
+      pagination: { page, limit },
+      sort: { createdAt: SortOrder.DESC },
+    });
+
+    console.log(data, meta);
+
+    return PaginatedResponseDto.success(data, meta);
   }
 }

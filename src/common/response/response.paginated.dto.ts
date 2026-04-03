@@ -29,18 +29,9 @@ export class PaginationMetadataDto implements IPaginationMetadata {
   totalPages: number;
 }
 
-export class PaginatedResponseDto<T> implements IApiPaginated<T> {
-  @Expose()
-  @IsBoolean()
-  success: boolean;
-
-  @Expose()
-  @IsString()
-  message: string;
-
+export class PaginatedDto<T> {
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => Object)
   @Expose()
   data: T[];
 
@@ -48,4 +39,52 @@ export class PaginatedResponseDto<T> implements IApiPaginated<T> {
   @ValidateNested()
   @Type(() => PaginationMetadataDto)
   meta: PaginationMetadataDto;
+}
+
+export class PaginatedResponseDto<T>
+  extends PaginatedDto<T>
+  implements IApiPaginated<T>
+{
+  @IsBoolean()
+  @Expose()
+  success: boolean;
+
+  @Expose()
+  @IsString()
+  message: string;
+
+  constructor(
+    data: T[],
+    meta: PaginationMetadataDto,
+    message: string,
+    success: boolean,
+  ) {
+    super();
+    this.success = success;
+    this.message = message;
+    this.data = data;
+    this.meta = meta;
+  }
+
+  static success<T>(
+    data: T[],
+    meta: PaginationMetadataDto,
+    message: string = 'success!',
+  ): PaginatedResponseDto<T> {
+    return new PaginatedResponseDto<T>(data, meta, message, true);
+  }
+
+  static error<T>(
+    message: string = 'error!',
+    data: T[] = [],
+    meta?: PaginationMetadataDto,
+  ): PaginatedResponseDto<T> {
+    const defaultMeta: PaginationMetadataDto = meta || {
+      currentPage: 0,
+      itemsPerPage: 0,
+      totalItems: 0,
+      totalPages: 0,
+    };
+    return new PaginatedResponseDto<T>(data, defaultMeta, message, false);
+  }
 }

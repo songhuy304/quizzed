@@ -7,7 +7,7 @@ export default new DataSource({
   type: 'postgres',
   url: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
-  entities: [`${__dirname}/../../**/*.entity{.ts,.js}`],
+  entities: ['src/**/*.entity.ts'],
   migrations: [`${__dirname}/../../migrations/*{.ts,.js}`],
   logging: true,
 });

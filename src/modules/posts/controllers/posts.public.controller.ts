@@ -1,27 +1,33 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { PostService } from '../services/post.service';
-import { PostCreateDto } from '../dtos/request';
-import { PostCreateResponseDto, PostResponseDto } from '../dtos/reponse';
+import { PostCreateDto, PostGetDto } from '../dtos/request';
+import { PostCreateResponseDto } from '../dtos/reponse';
 import { IApiBaseResponse } from '@/common/response/response.interface';
-import { ApiResponseDto } from '@/common/response';
 
 @Controller('/posts')
 export class PostPublicController {
   constructor(private readonly postService: PostService) {}
 
-  @Get('/')
-  public getPost() {
-    return { message: 'hello' };
-  }
-
   @Get(':id')
-  public getPostById(
-    @Param('id') postId: number,
-  ): Promise<ApiResponseDto<PostResponseDto>> {
+  public getPost(@Param('id', ParseIntPipe) postId: number) {
     return this.postService.getPost(postId);
   }
 
-  @Post('/')
+  @Get()
+  public getPosts(@Query() params: PostGetDto) {
+    return this.postService.getAllRepo(params);
+  }
+
+  @Post()
   public createPost(
     @Body() payload: PostCreateDto,
   ): Promise<PostCreateResponseDto> {
@@ -29,7 +35,9 @@ export class PostPublicController {
   }
 
   @Delete(':id')
-  public deletePost(@Param('id') postId: number): Promise<IApiBaseResponse> {
+  public deletePost(
+    @Param('id', ParseIntPipe) postId: number,
+  ): Promise<IApiBaseResponse> {
     return this.postService.delete(postId);
   }
 }
