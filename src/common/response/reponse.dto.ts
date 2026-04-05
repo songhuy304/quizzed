@@ -1,10 +1,19 @@
 import { IApiBaseResponse } from '@/common/response/response.interface';
+import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
 
 export class ApiGenericResponseDto implements IApiBaseResponse {
+  @ApiProperty({
+    description: 'Indicates if the operation was successful',
+    example: true,
+  })
   @Expose()
   success: boolean;
 
+  @ApiProperty({
+    description: 'Response message',
+    example: 'Operation completed successfully',
+  })
   @Expose()
   message: string;
 

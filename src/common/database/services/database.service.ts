@@ -19,7 +19,8 @@ export class DatabaseService implements OnModuleInit {
       await this.dataSource.query('SELECT 1');
       return { database: { status: 'up' } };
     } catch {
-      return { database: { status: 'down' } };
+      this.logger.error('Database is not healthy');
+      throw new Error('Database is not healthy');
     }
   }
 }

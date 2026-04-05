@@ -2,6 +2,7 @@ import {
   IApiPaginated,
   IPaginationMetadata,
 } from '@/common/response/response.interface';
+import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
 import {
   IsArray,
@@ -12,29 +13,35 @@ import {
 } from 'class-validator';
 
 export class PaginationMetadataDto implements IPaginationMetadata {
+  @ApiProperty({ description: 'Current page number', example: 1 })
   @Expose()
   @IsNumber()
   currentPage: number;
 
+  @ApiProperty({ description: 'Number of items per page', example: 10 })
   @Expose()
   @IsNumber()
   itemsPerPage: number;
 
+  @ApiProperty({ description: 'Total number of items', example: 100 })
   @Expose()
   @IsNumber()
   totalItems: number;
 
+  @ApiProperty({ description: 'Total number of pages', example: 10 })
   @Expose()
   @IsNumber()
   totalPages: number;
 }
 
 export class PaginatedDto<T> {
+  @ApiProperty({ description: 'Array of data items', isArray: true })
   @IsArray()
   @ValidateNested({ each: true })
   @Expose()
   data: T[];
 
+  @ApiProperty({ description: 'Pagination metadata' })
   @Expose()
   @ValidateNested()
   @Type(() => PaginationMetadataDto)

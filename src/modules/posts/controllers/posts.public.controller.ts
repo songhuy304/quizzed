@@ -12,7 +12,13 @@ import { PostService } from '../services/post.service';
 import { PostCreateDto, PostGetDto } from '../dtos/request';
 import { PostCreateResponseDto } from '../dtos/reponse';
 import { IApiBaseResponse } from '@/common/response/response.interface';
-
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
+@ApiTags('POST')
 @Controller('/posts')
 export class PostPublicController {
   constructor(private readonly postService: PostService) {}
@@ -33,7 +39,9 @@ export class PostPublicController {
   ): Promise<PostCreateResponseDto> {
     return this.postService.create(payload);
   }
-
+  @ApiOperation({ summary: 'Delete a post' })
+  @ApiParam({ name: 'id', description: 'Post ID' })
+  @ApiBearerAuth('accessToken')
   @Delete(':id')
   public deletePost(
     @Param('id', ParseIntPipe) postId: number,

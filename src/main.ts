@@ -9,6 +9,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { Logger } from 'nestjs-pino';
+import setupSwagger from './swagger';
 
 async function bootstrap() {
   const server = express();
@@ -42,6 +43,8 @@ async function bootstrap() {
         forbidNonWhitelisted: true,
       }),
     );
+
+    setupSwagger(app);
 
     // Start server
     await app.listen(port, host);
