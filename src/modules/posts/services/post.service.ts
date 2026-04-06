@@ -50,7 +50,7 @@ export class PostService implements IPostService {
 
   async getPost(id: number): Promise<ApiResponseDto<PostResponseDto>> {
     const post = await this.findOne(id);
-    return ApiResponseDto.success('post.success', post);
+    return ApiResponseDto.success(post);
   }
 
   // cách dùng builder query
