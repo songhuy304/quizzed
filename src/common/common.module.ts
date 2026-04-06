@@ -6,6 +6,7 @@ import configs from '@/common/configs';
 import { RequestModule } from '@/common/request/request.module';
 import { LoggerModule } from '@/common/logger/logger.module';
 import { HelperModule } from './helper/helper.module';
+import { GuardModule } from './guard/guard.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { HelperModule } from './helper/helper.module';
     }),
 
     // Core Infrastructure
+    GuardModule,
     DatabaseModule,
     RequestModule,
     LoggerModule,

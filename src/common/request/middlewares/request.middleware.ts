@@ -1,17 +1,23 @@
-import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
+import { Injectable, NestMiddleware } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request, Response, NextFunction } from 'express';
 import { APP_ENVIRONMENT } from '@/common/enums';
+import { PinoLogger } from 'nestjs-pino';
 
 @Injectable()
 export class RequestMiddleware implements NestMiddleware {
-  private readonly logger = new Logger('HTTP');
+  // private readonly logger = new Logger('HTTP');
   private readonly isDev: boolean;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly logger: PinoLogger,
+  ) {
     const env = this.configService.get<APP_ENVIRONMENT>('app.env');
     this.isDev =
       env === APP_ENVIRONMENT.LOCAL || env === APP_ENVIRONMENT.DEVELOPMENT;
+
+    this.logger.setContext('HTTP');
   }
 
   use(req: Request, res: Response, next: NextFunction) {
@@ -19,18 +25,12 @@ export class RequestMiddleware implements NestMiddleware {
       return next();
     }
 
-    const { method, originalUrl, ip } = req;
-    const userAgent = req.get('user-agent') || '';
-    const startTime = Date.now();
+    const { method, originalUrl } = req;
 
     res.on('finish', () => {
       const { statusCode } = res;
-      const contentLength = res.get('content-length');
-      const responseTime = Date.now() - startTime;
 
-      this.logger.log(
-        `${method} ${originalUrl} ${statusCode} ${contentLength} - ${responseTime}ms - ${ip} ${userAgent}`,
-      );
+      this.logger.info(`${method} ${originalUrl} ${statusCode}`);
     });
 
     next();

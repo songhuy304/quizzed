@@ -37,11 +37,19 @@ export const createLoggerConfig = (configService: ConfigService): Params => {
             target: 'pino-pretty',
             options: {
               colorize: true,
-              levelFirst: true,
-              translateTime: 'yyyy-mm-dd HH:MM:ss.l',
+
+              // format đẹp dễ đọc
+              translateTime: 'HH:MM:ss Z',
               ignore: 'pid,hostname',
+
+              // custom màu level
+              customColors: 'info:green,warn:yellow,error:red,debug:blue',
+
+              // format log
+              messageFormat: '{msg}',
+
+              // bật single line cho gọn
               singleLine: false,
-              messageFormat: '{context} {msg}',
             },
           }
         : undefined,

@@ -16,6 +16,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         ssl: { rejectUnauthorized: false },
         migrations: [__dirname + '/../../migrations/*{.ts,.js}'],
         migrationsRun: false,
+        extra: {
+          max: 10,
+        },
       }),
     }),
   ],

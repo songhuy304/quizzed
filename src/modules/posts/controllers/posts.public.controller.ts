@@ -18,6 +18,8 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
+import { PublicRoute } from '@/common/guard/decorator/guard.public.decorator';
+
 @ApiTags('POST')
 @Controller('/posts')
 export class PostPublicController {
@@ -28,6 +30,7 @@ export class PostPublicController {
     return this.postService.getPost(postId);
   }
 
+  @PublicRoute()
   @Get()
   public getPosts(@Query() params: PostGetDto) {
     return this.postService.getAllRepo(params);

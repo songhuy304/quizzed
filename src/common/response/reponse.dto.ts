@@ -17,17 +17,17 @@ export class ApiGenericResponseDto implements IApiBaseResponse {
   @Expose()
   message: string;
 
-  constructor(success: boolean, message: string) {
+  constructor(message: string, success: boolean) {
     this.success = success;
     this.message = message;
   }
 
-  static success(message: string): ApiGenericResponseDto {
-    return new ApiGenericResponseDto(true, message);
+  static success(message: string = 'success'): ApiGenericResponseDto {
+    return new ApiGenericResponseDto(message, true);
   }
 
-  static error(message: string): ApiGenericResponseDto {
-    return new ApiGenericResponseDto(false, message);
+  static error(message: string = 'error'): ApiGenericResponseDto {
+    return new ApiGenericResponseDto(message, false);
   }
 }
 
@@ -35,16 +35,19 @@ export class ApiResponseDto<T> extends ApiGenericResponseDto {
   @Expose()
   data: T | null;
 
-  constructor(success: boolean, message: string, data: T | null = null) {
-    super(success, message);
+  constructor(data: T | null, message: string, success: boolean) {
+    super(message, success);
     this.data = data;
   }
 
-  static success<T>(message: string, data?: T): ApiResponseDto<T> {
-    return new ApiResponseDto<T>(true, message, data ?? null);
+  static success<T>(data: T, message: string = 'success'): ApiResponseDto<T> {
+    return new ApiResponseDto<T>(data, message, true);
   }
 
-  static error<T>(message: string): ApiResponseDto<T> {
-    return new ApiResponseDto<T>(false, message, null);
+  static error<T>(
+    message: string = 'error',
+    data: T | null = null,
+  ): ApiResponseDto<T> {
+    return new ApiResponseDto<T>(data, message, false);
   }
 }

@@ -76,7 +76,7 @@ export class PaginatedResponseDto<T>
   static success<T>(
     data: T[],
     meta: PaginationMetadataDto,
-    message: string = 'success!',
+    message: string = 'success',
   ): PaginatedResponseDto<T> {
     return new PaginatedResponseDto<T>(data, meta, message, true);
   }

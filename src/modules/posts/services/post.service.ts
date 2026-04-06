@@ -1,5 +1,5 @@
 import { ERROR_POST } from '@/common/constants';
-import { SortOrder } from '@/common/enums';
+import { NotFoundException } from '@/common/filters/exception';
 import { HelperPaginationService } from '@/common/helper/services/helper.pagination.service';
 import { HelperQueryService } from '@/common/helper/services/helper.query.service';
 import {
@@ -7,7 +7,7 @@ import {
   ApiResponseDto,
   PaginatedResponseDto,
 } from '@/common/response';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PostResponseDto } from '../dtos/reponse';
@@ -28,7 +28,7 @@ export class PostService implements IPostService {
     const post = await this.postRepo.findOneBy({ id });
 
     if (!post) {
-      throw new HttpException(ERROR_POST.NOTFOUND, HttpStatus.NOT_FOUND);
+      throw new NotFoundException(ERROR_POST.NOTFOUND);
     }
 
     return post;
@@ -86,10 +86,7 @@ export class PostService implements IPostService {
         { field: 'content', op: 'ilike', value: search },
       ],
       pagination: { page, limit },
-      sort: { createdAt: SortOrder.DESC },
     });
-
-    console.log(data, meta);
 
     return PaginatedResponseDto.success(data, meta);
   }
